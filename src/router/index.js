@@ -102,7 +102,31 @@ export default new Router({
                     path: '/addArticle',
                     component: resolve => require(['../components/page/AddArticle.vue'],resolve),
                     meta:{title:'发布文章'}
-                }
+                },
+                //编辑文章
+                {
+                    path: '/editArticle/:articleId',
+                    component: resolve => require(['../components/page/EditArticle.vue'],resolve),
+                    meta:{title:'编辑文章'}
+                },
+                //推荐列表
+                {
+                    path: '/recommendList',
+                    component: resolve => require(['../components/page/RecommendList.vue'], resolve),
+                    meta: { title: '推荐列表' }
+                },
+                //发布推荐
+                {
+                    path:'/addRecommend',
+                    component: resolve => require(['../components/page/AddRecommend.vue'],resolve),
+                    meta:{title:'添加推荐'}
+                },
+                //编辑推荐
+                {
+                    path:'/editRecommend/:recommendId',
+                    component: resolve => require(['../components/page/EditRecommend.vue'],resolve),
+                    meta:{title:'修改推荐'}
+                },
             ]
         },
         {

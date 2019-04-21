@@ -58,10 +58,15 @@
     import { quillEditor } from 'vue-quill-editor';
     import global_ from '../common/Global';
     export default {
-        name: 'AddArticle',
+        name: 'EditArticle',
         props:{
             value: {
                 type: String
+            },
+            /*上传图片的地址*/
+            uploadUrl: {
+                type: String,
+                default: ''
             },
             /*上传图片的file控件name*/
             fileName: {
@@ -75,6 +80,7 @@
         },
         data(){
             return {
+                articleId:'',
                 articleName:'',
                 articleCategory:'',
                 articleContent: '',
@@ -91,43 +97,57 @@
             quillEditor,
         },
         methods: {
-            //获取分类信息数据
-            getCategoryInfo:function(){
+            //获取参数
+            getParam(){
+              var articleId = this.$route.params.articleId;
+              //获取文章详细信息
               var url = global_.serverUrl;
               var that = this;
-              this.$axios.get(url+"/category/getCategoryList").then(res => {
-                  if (res.data.status==0){
-                      that.categoryArray = res.data.data;
-                  }
-              })
+              this.$axios.get(url+'/article/getArticleById?articleId='+articleId).then(res => {
+                  that.articleId = articleId;
+                  that.articleCategory = res.data.data.articleCategory;
+                  that.articleContent = res.data.data.articleContent;
+                  that.articleName = res.data.data.articleName
+              });
+            },
+
+            //获取分类信息数据
+            getCategoryInfo:function(){
+                var url = global_.serverUrl;
+                var that = this;
+                this.$axios.get(url+"/category/getCategoryList").then(res => {
+                    if (res.data.status==0){
+                        that.categoryArray = res.data.data;
+                    }
+                })
             },
             onChange() {
                 this.$emit('input', this.articleContent)
             },
             /*选择上传图片切换*/
             onFileChange(e){
-              var fileInput = e.target;
-              if(fileInput.files.length === 0){
-                  return;
-              }
-              this.editor.focus();
-              if (fileInput.files[0].size>this.maxUploadSize){
-                  this.$alert('图片不能大于500KB\', \'图片尺寸过大',{
-                      confirmButtonText:'确定',
-                      type:'warning',
-                  })
-              }
-              var data = new FormData(fileInput.files[0]);
-              var url = global_.serverUrl;
-              var save_url = url + '/article/articleUpload';
-              data.append(this.fileName,fileInput.files[0]);
-              this.$axios.post(save_url,data).then(res => {
-                  if (res.data.status == 1){
-                      this.$message.success(res.data.msg);
-                  }else{
-                      this.editor.insertEmbed(this.editor.getSelection().index, 'image', res.data);
-                  }
-              })
+                var fileInput = e.target;
+                if(fileInput.files.length === 0){
+                    return;
+                }
+                this.editor.focus();
+                if (fileInput.files[0].size>this.maxUploadSize){
+                    this.$alert('图片不能大于500KB\', \'图片尺寸过大',{
+                        confirmButtonText:'确定',
+                        type:'warning',
+                    })
+                }
+                var data = new FormData(fileInput.files[0]);
+                var url = global_.serverUrl;
+                var save_url = url + '/article/articleUpload';
+                data.append(this.fileName,fileInput.files[0]);
+                this.$axios.post(save_url,data).then(res => {
+                    if (res.data.status == 1){
+                        this.$message.success(res.data.msg);
+                    }else{
+                        this.editor.insertEmbed(this.editor.getSelection().index, 'image', res.data);
+                    }
+                })
             },
             /*点击上传图片按钮*/
             imgClick(){
@@ -145,6 +165,7 @@
             },
             //提交表单数据
             submit(){
+                var articleId = this.articleId;
                 var articleName = this.articleName;
                 var articleCategory = this.articleCategory;
                 var articleContent = this.articleContent;
@@ -167,6 +188,7 @@
                     userId = localStorage.getItem('userId');
                 }
                 var article = {
+                    articleId:articleId,
                     articleName:articleName,
                     articleCategory:articleCategory,
                     articleContent:articleContent,
@@ -174,37 +196,38 @@
                 }
                 var url = global_.serverUrl;
                 var that = this;
-                this.$axios.post(url+'/article/addArticle',article).then(res => {
+                this.$axios.post(url+'/article/updateArticle',article).then(res => {
                     if (res.data.status==0){
-                        this.$message.success('发布成功！');
+                        this.$message.success('更新成功！');
                         setTimeout(function () {
                             that.$router.push({path:'/articleList'});
                         })
                     } else {
-                        this.$message.success('发布失败！');
+                        this.$message.success('更新失败！');
                     }
                 })
 
             }
         },
         computed:{
-          editor(){
-              return this.$refs.myTextEditor.quill
-          }
+            editor(){
+                return this.$refs.myTextEditor.quill
+            }
         },
         watch:{
-          'value'(newVal,oldVal){
-              if (this.editor){
-                  if (newVal!==this.articleContent){
-                      this.articleContent = newVal;
-                  }
-              }
-          }
+            'value'(newVal,oldVal){
+                if (this.editor){
+                    if (newVal!==this.articleContent){
+                        this.articleContent = newVal;
+                    }
+                }
+            }
         },
         //Vue加载时执行的函数
         mounted() {
             this.getCategoryInfo();
             this.articleContent = this.value;
+            this.getParam();
         }
     }
 </script>

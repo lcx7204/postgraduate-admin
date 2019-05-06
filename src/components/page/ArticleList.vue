@@ -63,7 +63,7 @@
                 //分页信息
                 pageNum:1,              //当前页
                 totalCount:0,           //记录总数
-                pageSize:2,             //每页显示条数
+                pageSize:10,             //每页显示条数
             }
         },
         computed: {

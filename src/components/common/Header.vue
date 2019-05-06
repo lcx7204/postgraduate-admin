@@ -47,13 +47,13 @@
             return {
                 collapse: false,
                 fullscreen: false,
-                name: 'liyixuan',
+                name: 'admin',
                 message: 2
             }
         },
         computed:{
             username(){
-                let username = ('ms_username');
+                let username = localStorage.getItem("ms_username");
                 return username ? username : this.name;
             }
         },
@@ -96,7 +96,7 @@
                     }
                 }
                 this.fullscreen = !this.fullscreen;
-            }
+            },
         },
         mounted(){
             if(document.body.clientWidth < 1500){

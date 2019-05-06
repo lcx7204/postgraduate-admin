@@ -127,6 +127,12 @@ export default new Router({
                     component: resolve => require(['../components/page/EditRecommend.vue'],resolve),
                     meta:{title:'修改推荐'}
                 },
+                //聊天
+                {
+                    path:'/chat',
+                    component: resolve => require(['../components/page/chat.vue'],resolve),
+                    meta:{title:'用户聊天'}
+                }
             ]
         },
         {
